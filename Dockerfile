@@ -1,28 +1,29 @@
-FROM maven:3-jdk-7
+FROM openfrontier/jenkins-slave:maven
 
 MAINTAINER zsx <thinkernel@gmail.com>
 
-ENV JENKINS_HOME /home/jenkins
-
-# Install a basic SSH server
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    openssh-server \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ruby \
   && rm -rf /var/lib/apt/lists/*
 
-RUN sed -i 's|session    required     pam_loginuid.so|session    optional     pam_loginuid.so|g' /etc/pam.d/sshd
-RUN mkdir -p /var/run/sshd
+ENV SENCHA_HOME=/opt/Sencha
+ENV SENCHA_CMD_VERSION=5.0.3.324
+ENV SENCHA_CMD_HOME ${SENCHA_HOME}/Cmd/${SENCHA_CMD_VERSION}
+ENV EXT_VERSION=5.0.1
+ENV EXT_HOME=${SENCHA_HOME}/ext-${EXT_VERSION}
 
-# Standard SSH port
-EXPOSE 22
+# Install sencha-cmd
+RUN curl -o /cmd.run.zip http://cdn.sencha.com/cmd/${SENCHA_CMD_VERSION}/SenchaCmd-${SENCHA_CMD_VERSION}-linux-x64.run.zip && \
+    unzip -p /cmd.run.zip > /cmd-install.run && \
+    chmod +x /cmd-install.run && \
+    /cmd-install.run --mode unattended --prefix /opt && \
+    rm /cmd-install.run /cmd.run.zip
 
-# Add user jenkins to the image
-RUN useradd -m -d "${JENKINS_HOME}" -u 1000 -U -s /bin/bash jenkins
-RUN echo "jenkins:jenkins" | chpasswd
+# Switch extjs codegen repo location
+RUN sed -i "s#^repo.local.dir=.*#repo.local.dir=/home/jenkins/sencha-repo#g" ${SENCHA_CMD_HOME}/sencha.cfg
 
-VOLUME "${JENKINS_HOME}"
-
-# Add setup script.
-COPY jenkins-slave-setup.sh /usr/local/bin/jenkins-slave-setup.sh
-
-# Start sshd by default.
-CMD ["/usr/sbin/sshd", "-D"]
+# Install extJS
+RUN curl -o /ext-gpl.zip http://cdn.sencha.com/ext/gpl/ext-${EXT_VERSION}-gpl.zip && \
+    unzip -q -d ${SENCHA_HOME} /ext-gpl.zip && \
+    rm /ext-gpl.zip
