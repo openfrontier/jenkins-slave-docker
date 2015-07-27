@@ -9,7 +9,7 @@ RUN apt-get update && \
 
 ENV SENCHA_HOME=/opt/Sencha
 ENV SENCHA_CMD_VERSION=5.0.3.324
-ENV SENCHA_CMD_HOME ${SENCHA_HOME}/Cmd/${SENCHA_CMD_VERSION}
+ENV SENCHA_CMD_HOME=${SENCHA_HOME}/Cmd/${SENCHA_CMD_VERSION}
 ENV EXT_VERSION=5.0.1
 ENV EXT_HOME=${SENCHA_HOME}/ext-${EXT_VERSION}
 
@@ -27,3 +27,6 @@ RUN sed -i "s#^repo.local.dir=.*#repo.local.dir=/home/jenkins/sencha-repo#g" ${S
 RUN curl -o /ext-gpl.zip http://cdn.sencha.com/ext/gpl/ext-${EXT_VERSION}-gpl.zip && \
     unzip -q -d ${SENCHA_HOME} /ext-gpl.zip && \
     rm /ext-gpl.zip
+
+# Add sencha-cmd to PATH
+RUN echo "PATH=${SENCHA_CMD_HOME}:/usr/local/bin:/usr/bin:/bin" >> /etc/environment
