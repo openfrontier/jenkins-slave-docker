@@ -24,6 +24,13 @@ if [ -n "${NEXUS_URL}" ] ; then
       <mirrorOf>*</mirrorOf>
     </mirror>
   </mirrors>
+  <servers>
+    <server>
+      <id>deployment</id>
+      <username>deployment</username>
+      <password>deployment123</password>
+    </server>
+  </servers>
 </settings>
 EOF
     chown -R jenkins:jenkins /home/jenkins/.m2
