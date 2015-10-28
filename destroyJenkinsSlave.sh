@@ -2,4 +2,6 @@
 
 PROJECT_NAME=${PROJECT_NAME:-demo}
 
-docker rm -v ${PROJECT_NAME}-workspace
+if [ -n "$(docker ps -a | grep ${PROJECT_NAME}-workspace)" ]; then
+  docker rm -v ${PROJECT_NAME}-workspace
+fi
