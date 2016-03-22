@@ -30,3 +30,7 @@ RUN curl -o /ext-gpl.zip http://cdn.sencha.com/ext/gpl/ext-${EXT_VERSION}-gpl.zi
 
 # Add sencha-cmd to PATH
 RUN echo "PATH=${SENCHA_CMD_HOME}:/usr/local/bin:/usr/bin:/bin" >> /etc/environment
+
+# Add nodeJS
+RUN curl -sL https://deb.nodesource.com/setup_5.x | bash -
+RUN apt-get install -y nodejs
